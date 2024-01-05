@@ -3,76 +3,66 @@ import css from './App.module.css';
 import { Loader } from 'components/Loader/Loader';
 import { ImageGallery } from 'components/ImageGallery/ImageGallery';
 import { Button } from 'components/Button/Button';
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchCards } from 'utils/fetch-api';
 import Notiflix from 'notiflix';
 
-export class App extends Component {
-  state = {
-    searchQuery: '',
-    page: null,
-    images: [],
-    isLoad: false,
-    totalHits: null,
-  };
+export const App = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(null);
+  const [images, setImages] = useState([]);
+  const [isLoad, setIsLoad] = useState(false);
+  const [totalHits, setTotalHits] = useState(null);
 
-  componentDidUpdate(_, prevState) {
-    const { page, searchQuery } = this.state;
-    if (searchQuery !== prevState.searchQuery || page !== prevState.page) {
-      this.setState({
-        isLoad: true,
-      });
-
-      fetchCards(searchQuery, page)
-        .then(({ data: { hits, totalHits } }) => {
-          if (!totalHits) {
-            Notiflix.Notify.info('Nothing found for your request!');
-            return;
-          }
-          this.setState(prevState => ({
-            images: [...prevState.images, ...hits],
-            totalHits: totalHits,
-          }));
-        })
-        .catch(error => {
-          Notiflix.Notify.failure(
-            'Sorry, there are no images matching your search query. Please try again.'
-          );
-          console.log(error);
-          return;
-        })
-        .finally(() => {
-          this.setState({ isLoad: false });
-        });
+  useEffect(() => {
+    if (!searchQuery) {
+      return;
     }
-  }
 
-  changePage = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+    setIsLoad(true);
+
+    fetchCards(searchQuery, page)
+      .then(({ data: { hits, totalHits } }) => {
+        if (!totalHits) {
+          Notiflix.Notify.info('Nothing found for your request!');
+          return;
+        }
+        setImages(prevImages => [...prevImages, ...hits]);
+        setTotalHits(totalHits);
+      })
+      .catch(error => {
+        Notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+        console.log(error);
+        return;
+      })
+      .finally(() => {
+        setIsLoad(false);
+      });
+  }, [searchQuery, page]);
+
+  const changePage = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  onSubmit = value => {
-    this.setState({
-      searchQuery: value,
-      page: 1,
-      images: [],
-      totalHits: null,
-    });
+  const onSubmit = value => {
+    setSearchQuery(value);
+    setPage(1);
+    setImages([]);
+    setTotalHits(null);
   };
 
-  render() {
-    const { images, isLoad, totalHits } = this.state;
-    const isEndOfCollection = totalHits > images.length;
+  const isEndOfCollection = totalHits > images.length;
 
-    return (
-      <div className={css.container}>
-        <Searchbar onSubmit={this.onSubmit} />
-        {!!images.length && <ImageGallery pictures={images} />}
-        {!isLoad && isEndOfCollection ? (
-          <Button onChange={this.changePage}>Load more</Button>
-        ) : null}
-        {isLoad && <Loader />}
-      </div>
-    );
-  }
-}
+  return (
+    <div className={css.container}>
+      <Searchbar onSubmit={onSubmit} />
+      {!!images.length && <ImageGallery pictures={images} />}
+      {!isLoad && isEndOfCollection ? (
+        <Button onChange={changePage}>Load more</Button>
+      ) : null}
+      {isLoad && <Loader />}
+    </div>
+  );
+};
