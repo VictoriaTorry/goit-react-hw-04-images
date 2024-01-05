@@ -1,0 +1,18 @@
+.loadMoreBtn {
+  padding: 15px 40px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin: 0 auto;
+  color: #fff;
+  background-color: #1c2425;
+  margin-bottom: 30px;
+  transition: background-color linear 0.2s;
+}
+
+.loadMoreBtn:hover,
+.loadMoreBtn:focus {
+  background-color: #344244;
+}
