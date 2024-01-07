@@ -5,7 +5,7 @@ export const Loader = () => {
     <ThreeDots
       color="#1c2425"
       wrapperStyle={{
-        justifyContent: 'center',
+        justifyContent: 'center'
       }}
     />
   );

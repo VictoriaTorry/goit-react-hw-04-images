@@ -18,6 +18,8 @@ export const App = () => {
     if (!searchQuery) {
       return;
     }
+
+    setIsLoad(true);
     
     fetchCards(searchQuery, page)
       .then(({ data: { hits, totalHits } }) => {
@@ -49,7 +51,6 @@ export const App = () => {
     setPage(1);
     setImages([]);
     setTotalHits(null);
-    setIsLoad(true);
   };
 
   const isEndOfCollection = totalHits > images.length;
