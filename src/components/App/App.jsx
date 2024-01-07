@@ -18,9 +18,7 @@ export const App = () => {
     if (!searchQuery) {
       return;
     }
-
-    setIsLoad(true);
-
+    
     fetchCards(searchQuery, page)
       .then(({ data: { hits, totalHits } }) => {
         if (!totalHits) {
@@ -51,6 +49,7 @@ export const App = () => {
     setPage(1);
     setImages([]);
     setTotalHits(null);
+    setIsLoad(true);
   };
 
   const isEndOfCollection = totalHits > images.length;
@@ -58,6 +57,7 @@ export const App = () => {
   return (
     <div className={css.container}>
       <Searchbar onSubmit={onSubmit} />
+      {isLoad && <Loader />}
       {!!images.length && <ImageGallery pictures={images} />}
       {!isLoad && isEndOfCollection ? (
         <Button onChange={changePage}>Load more</Button>
